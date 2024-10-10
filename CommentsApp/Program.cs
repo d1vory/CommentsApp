@@ -1,7 +1,21 @@
+
+
+using CommentsApp.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(builder.Environment.ContentRootPath)
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .Build();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddHttpLogging(o => { });
+builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddDbContext<BaseApplicationContext, ApplicationContext>(ServiceLifetime.Transient);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -14,7 +28,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+//app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UsePathBase(new PathString("/api"));
+app.UseRouting();
+app.MapControllers();
+app.UseHttpLogging();
+
 
 var summaries = new[]
 {
