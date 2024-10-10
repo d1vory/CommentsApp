@@ -13,6 +13,6 @@ public class User
     public string Email { get; set; } = null!;
     
     [StringLength(250)]
-    public string HomePage { get; set; } = null!;
+    public string HomePage { get; set; } = "";
     
 }
