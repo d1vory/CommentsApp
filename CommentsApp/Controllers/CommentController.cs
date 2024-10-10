@@ -23,9 +23,8 @@ public class CommentController: ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState.StringifyModelErrors());
         var comment = await _service.CreateComment(dto);
- 
         
-        return Ok("Created");
+        return Ok(comment);
     }
     
     

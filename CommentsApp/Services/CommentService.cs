@@ -1,3 +1,4 @@
+using AutoMapper;
 using CommentsApp.Data;
 using CommentsApp.DTO.Comment;
 using CommentsApp.Models;
@@ -10,10 +11,13 @@ namespace CommentsApp.Services;
 public class CommentService
 {
     protected readonly BaseApplicationContext _db;
+    protected readonly IMapper _mapper;
 
-    public CommentService(BaseApplicationContext db)
+
+    public CommentService(BaseApplicationContext db, IMapper mapper)
     {
         _db = db;
+        _mapper = mapper;
     }
 
     public async Task<DetailCommentDTO> CreateComment(CreateCommentDTO dto)
@@ -23,7 +27,8 @@ public class CommentService
         var comment = new Comment() { Text = dto.Text, User = user };
         await _db.Comments.AddAsync(comment);
         await _db.SaveChangesAsync();
-        
+        var createdCommentDTO = _mapper.Map<DetailCommentDTO>(comment);
+        return createdCommentDTO;
     }
 
     private async Task<User> GetOrCreateUser(CreateCommentDTO dto)
