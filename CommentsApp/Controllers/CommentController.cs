@@ -10,6 +10,11 @@ public class CommentController: ControllerBase
 {
     private readonly CommentService _service;
 
+    public CommentController(CommentService service)
+    {
+        _service = service;
+    }
+
     [HttpGet]
     [Route("")]
     public async Task<ActionResult> GetComments()
@@ -21,7 +26,7 @@ public class CommentController: ControllerBase
     [Route("")]
     public async Task<ActionResult> CreateComment([FromBody] CreateCommentDTO dto)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState.StringifyModelErrors());
+        if (!ModelState.IsValid) return BadRequest(ModelState.GetModelErrors());
         var comment = await _service.CreateComment(dto);
         
         return Ok(comment);

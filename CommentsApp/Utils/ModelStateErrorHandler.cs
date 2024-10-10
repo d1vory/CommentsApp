@@ -30,5 +30,4 @@ public static class ModelStateErrorHandler
         return errorsBuilder.ToString();
     }
     
-    //public static object GetObjetErrors(this ModelStateDictionary errDictionary) 
 }

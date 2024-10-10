@@ -12,10 +12,10 @@ public class CreateCommentDTO
     [DataType(DataType.EmailAddress)]
     [MaxLength(150)]
     public string Email { get; set; } = null!;
-    
+
     [DataType(DataType.Url)]
     [MaxLength(250)]
-    public string HomePage { get; set; } = null!;
+    public string HomePage { get; set; } = "";
 
     [Required]
     public string Text { get; set; } = null!;
