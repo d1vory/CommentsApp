@@ -11,7 +11,7 @@ public abstract class BaseApplicationContext: DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //SeedFakeData(modelBuilder);
+        SeedFakeData(modelBuilder);
     }
     
     private void SeedFakeData(ModelBuilder modelBuilder)
@@ -32,7 +32,8 @@ public abstract class BaseApplicationContext: DbContext
         var commentFaker = new Faker<Comment>()
             .RuleFor(c => c.Id, f => commentIds++)
             .RuleFor(c => c.Text, f => f.Lorem.Text())
-            .RuleFor(c => c.UserId, f => f.PickRandom(users).Id);
+            .RuleFor(c => c.UserId, f => f.PickRandom(users).Id)
+            .RuleFor(c => c.CreatedAt, f => f.Date.Recent(7, new DateTime(2024, 10, 11)));
         var comments = commentFaker.Generate(150);
         
         modelBuilder.Entity<Comment>().HasData(comments);

@@ -11,4 +11,6 @@ public class Comment
     public int UserId { get; set; }
     [ForeignKey("UserId")]
     public User User { get; set; }  = null!;
+    
+    public DateTime CreatedAt { get; set; }
 }
