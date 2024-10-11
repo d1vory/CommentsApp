@@ -1,6 +1,7 @@
 using AutoMapper;
 using CommentsApp.Data;
 using CommentsApp.DTO.Comment;
+using CommentsApp.DTO.Common;
 using CommentsApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,19 @@ public class CommentService
         var createdCommentDTO = _mapper.Map<DetailCommentDTO>(comment);
         return createdCommentDTO;
     }
+    
+    public async Task<PaginatedList<ListCommentDTO>> GetCommentsList(int pageIndex, int pageSize=25)
+    {
+        var comments = _db.Comments.OrderBy(b => b.Id)
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize);
+            
+        var count = await _db.Comments.CountAsync();
+        var totalPages = (int)Math.Ceiling(count / (double)pageSize);
+        
+        var commentsDTO = await _mapper.ProjectTo<ListCommentDTO>(comments).ToListAsync();
+        return new PaginatedList<ListCommentDTO>(commentsDTO, pageIndex, totalPages);
+    }
 
     private async Task<User> GetOrCreateUser(CreateCommentDTO dto)
     {
@@ -51,4 +65,6 @@ public class CommentService
     {
         
     }
+
+
 }
