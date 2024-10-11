@@ -34,15 +34,9 @@ public class CommentService
     
     public async Task<PaginatedList<ListCommentDTO>> GetCommentsList(int pageIndex, int pageSize=25)
     {
-        var comments = _db.Comments.OrderBy(b => b.Id)
-            .Skip((pageIndex - 1) * pageSize)
-            .Take(pageSize);
-            
-        var count = await _db.Comments.CountAsync();
-        var totalPages = (int)Math.Ceiling(count / (double)pageSize);
-        
-        var commentsDTO = await _mapper.ProjectTo<ListCommentDTO>(comments).ToListAsync();
-        return new PaginatedList<ListCommentDTO>(commentsDTO, pageIndex, totalPages);
+        var comments = _db.Comments.OrderBy(b => b.Id);
+        var res = await PaginatedList<ListCommentDTO>.CreateAsync(comments, pageIndex, pageSize, _mapper);
+        return res;
     }
 
     private async Task<User> GetOrCreateUser(CreateCommentDTO dto)
