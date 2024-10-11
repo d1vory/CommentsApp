@@ -9,4 +9,6 @@ public class ListCommentDTO
     public string Text { get; set; } = null!;
     
     public DetailUserDTO User { get; set; }  = null!;
+    
+    public DateTime CreatedAt { get; set; }
 }

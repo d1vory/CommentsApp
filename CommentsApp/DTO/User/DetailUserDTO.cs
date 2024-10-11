@@ -7,4 +7,6 @@ public class DetailUserDTO
     public string Username { get; set; } 
     
     public string HomePage { get; set; }
+    
+    public string Email { get; set; }
 }

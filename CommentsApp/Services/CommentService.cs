@@ -32,9 +32,11 @@ public class CommentService
         return createdCommentDTO;
     }
     
-    public async Task<PaginatedList<ListCommentDTO>> GetCommentsList(int pageIndex, int pageSize=25)
+    public async Task<PaginatedList<ListCommentDTO>> GetCommentsList(int pageIndex, int pageSize, string sortOrder)
     {
-        var comments = _db.Comments.OrderBy(b => b.Id);
+        var comments = SortItems(_db.Comments, sortOrder);
+        
+        
         var res = await PaginatedList<ListCommentDTO>.CreateAsync(comments, pageIndex, pageSize, _mapper);
         return res;
     }
@@ -48,6 +50,34 @@ public class CommentService
         await _db.Users.AddAsync(user);
         await _db.SaveChangesAsync();
         return user;
+    }
+
+    private IQueryable<Comment> SortItems(IQueryable<Comment> items, string sortOrder)
+    {
+        items = items.Include(c => c.User);
+        switch (sortOrder)
+        {
+            case "username":
+                items = items.OrderBy(c => c.User.Username);
+                break;
+            case "-username":
+                items = items.OrderByDescending(c => c.User.Username);
+                break;
+            case "email":
+                items = items.OrderBy(c => c.User.Email);
+                break;
+            case "-email":
+                items = items.OrderByDescending(c => c.User.Email);
+                break;
+            case "createdAt":
+                items = items.OrderBy(c => c.CreatedAt);
+                break;
+            case "-createdAt":
+                items = items.OrderByDescending(c => c.CreatedAt);
+                break;
+        }
+
+        return items;
     }
 
     private async Task ValidateComment(CreateCommentDTO dto)

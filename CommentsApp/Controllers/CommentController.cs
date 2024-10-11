@@ -17,9 +17,9 @@ public class CommentController: ControllerBase
 
     [HttpGet]
     [Route("")]
-    public async Task<ActionResult> GetComments([FromQuery]int pageIndex=1, int pageSize=25)
+    public async Task<ActionResult> GetComments([FromQuery]int pageIndex=1, int pageSize=25, string sortOrder = "-createdAt")
     {
-        var comments = await _service.GetCommentsList(pageIndex, pageSize);
+        var comments = await _service.GetCommentsList(pageIndex, pageSize, sortOrder);
         return Ok(comments);
     }
 
