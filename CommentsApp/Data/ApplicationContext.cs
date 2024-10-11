@@ -1,3 +1,5 @@
+using Bogus;
+using CommentsApp.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CommentsApp.Data;

@@ -2,6 +2,7 @@ using AutoMapper;
 using CommentsApp.DTO.Comment;
 using CommentsApp.DTO.User;
 
+
 namespace CommentsApp.DTO;
 
 public class MappingProfile: Profile
@@ -10,6 +11,6 @@ public class MappingProfile: Profile
     {
         CreateMap<Models.User, DetailUserDTO>();
         CreateMap<Models.Comment, DetailCommentDTO>();
-
+        CreateMap<Models.Comment, ListCommentDTO>();
     }
 }
