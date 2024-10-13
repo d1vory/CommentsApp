@@ -25,10 +25,10 @@ public class CommentController: ControllerBase
 
     [HttpPost]
     [Route("")]
-    public async Task<ActionResult> CreateComment([FromBody] CreateCommentDTO dto)
+    public async Task<ActionResult> CreateComment([FromForm] CreateCommentDTO dto, IFormFile? photo)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState.GetModelErrors());
-        var comment = await _service.CreateComment(dto);
+        var comment = await _service.CreateComment(dto, photo);
         
         return Ok(comment);
     }

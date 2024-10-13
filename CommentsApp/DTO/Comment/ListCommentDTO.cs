@@ -11,4 +11,6 @@ public class ListCommentDTO
     public DetailUserDTO User { get; set; }  = null!;
     
     public DateTime CreatedAt { get; set; }
+    
+    public string? Photo { get; set; } = null;
 }
