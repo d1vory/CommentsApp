@@ -105,31 +105,39 @@ public class CommentService
     {
         var fileName = $"{Guid.NewGuid()}-{Path.GetFileName(image.FileName)}";
         var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", fileName);
-
-        using (var stream = image.OpenReadStream())
-        {
-            await SaveImage(stream, filePath);
-        }
+        
+        await SaveImage(image, filePath);
         
         var imagePath = $"images/{fileName}";
         return imagePath;
     }
 
-    private async Task SaveImage(Stream stream, string imagePath)
+    private async Task SaveImage(IFormFile imageForm, string imagePath)
     {
+        var extension = Path.GetExtension(imagePath);
+        var allowedExtensions = new[]{".jpg", ".jpeg", ".gif", ".png"};
+        if (!allowedExtensions.Contains(extension.ToLower()))
+        {
+            throw new BadRequestException("This file type is not supported");
+        }
+        
         try
         {
-            var image = await Image.LoadAsync(stream);
-            if (image == null) throw new BadRequestException("Provided file is not image!");
-            var width=image.Width;
-            var height=image.Height;
-            if (width > 320 || height > 240)
+            using (var stream = imageForm.OpenReadStream())
             {
-                image.Mutate(x => x.Resize(320, 240));
+                var image = await Image.LoadAsync(stream);
+                if (image == null) throw new BadRequestException("Provided file is not image!");
+                var width = image.Width;
+                var height = image.Height;
+                if (width > 320 || height > 240)
+                {
+                    image.Mutate(x => x.Resize(320, 240));
+                }
+
+                await image.SaveAsync(imagePath);
             }
-            await image.SaveAsync(imagePath);
         }
-        catch(InvalidImageContentException exc)
+        catch (Exception e) when (e is InvalidImageContentException or UnknownImageFormatException)
         {
             throw new BadRequestException("Provided file is not image!");
         }
