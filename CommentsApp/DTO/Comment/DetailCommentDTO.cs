@@ -10,5 +10,5 @@ public class DetailCommentDTO
     
     public DetailUserDTO User { get; set; }  = null!;
     
-    public string? Photo { get; set; } = null;
+    public string? File { get; set; } = null;
 }

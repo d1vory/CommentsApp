@@ -15,8 +15,8 @@ namespace CommentsApp.Services;
 
 public class CommentService
 {
-    protected readonly BaseApplicationContext _db;
-    protected readonly IMapper _mapper;
+    private readonly BaseApplicationContext _db;
+    private readonly IMapper _mapper;
     private IWebHostEnvironment _webHostEnvironment;
 
 

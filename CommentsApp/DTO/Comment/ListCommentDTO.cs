@@ -12,5 +12,5 @@ public class ListCommentDTO
     
     public DateTime CreatedAt { get; set; }
     
-    public string? Photo { get; set; } = null;
+    public string? File { get; set; } = null;
 }
