@@ -34,9 +34,9 @@ public class CommentService
         string? imagePath = null;
         if (photo != null)
         {
-            imagePath = await UploadPhoto(photo);
+            imagePath = await UploadFile(photo);
         }
-        var comment = new Comment() { Text = dto.Text, User = user, Photo = imagePath, CreatedAt = DateTime.Now};
+        var comment = new Comment() { Text = dto.Text, User = user, File = imagePath, CreatedAt = DateTime.Now};
         await _db.Comments.AddAsync(comment);
         await _db.SaveChangesAsync();
         var createdCommentDTO = _mapper.Map<DetailCommentDTO>(comment);
@@ -101,26 +101,42 @@ public class CommentService
         
     }
 
-    private async Task<string> UploadPhoto(IFormFile image)
+    private async Task<string> UploadFile(IFormFile file)
     {
-        var fileName = $"{Guid.NewGuid()}-{Path.GetFileName(image.FileName)}";
+        var fileName = $"{Guid.NewGuid()}-{Path.GetFileName(file.FileName)}";
         var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", fileName);
         
-        await SaveImage(image, filePath);
+        var extension = Path.GetExtension(filePath).ToLower();
+        var allowedPhotoExtensions = new[]{".jpg", ".jpeg", ".gif", ".png"};
+        var allowedFileExtensions = new[]{".txt"};
+        if (allowedPhotoExtensions.Contains(extension))
+        {
+            await SaveImage(file, filePath);
+        }
+        else if (allowedFileExtensions.Contains(extension))
+        {
+            await SaveFile(file, filePath);
+        }
+        else
+        {
+            throw new BadRequestException("This file type is not supported");
+        }
         
         var imagePath = $"images/{fileName}";
         return imagePath;
     }
 
+    private async Task SaveFile(IFormFile fileForm, string path)
+    {
+        using (var stream = new FileStream(path, FileMode.Create))
+        {
+            await fileForm.CopyToAsync(stream);
+        }
+    }
+    
     private async Task SaveImage(IFormFile imageForm, string imagePath)
     {
-        var extension = Path.GetExtension(imagePath);
-        var allowedExtensions = new[]{".jpg", ".jpeg", ".gif", ".png"};
-        if (!allowedExtensions.Contains(extension.ToLower()))
-        {
-            throw new BadRequestException("This file type is not supported");
-        }
-        
+
         try
         {
             using (var stream = imageForm.OpenReadStream())

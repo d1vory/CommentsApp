@@ -16,5 +16,5 @@ public class Comment
     public DateTime CreatedAt { get; set; }
 
     [StringLength(1000)] 
-    public string? Photo { get; set; } = null;
+    public string? File { get; set; } = null;
 }

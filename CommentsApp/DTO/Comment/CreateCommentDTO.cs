@@ -21,5 +21,5 @@ public class CreateCommentDTO
     public string Text { get; set; } = null!;
     
     [MaxLength(1000)] 
-    public string? Photo { get; set; } = null;
+    public string? File { get; set; } = null;
 }
