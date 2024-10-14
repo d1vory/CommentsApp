@@ -17,4 +17,13 @@ public class Comment
 
     [StringLength(1000)] 
     public string? File { get; set; } = null;
+
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid DiscussionKey { get; set; }
+    
+    public int? ParentCommentId { get; set; }
+    [ForeignKey("ParentCommentId")]
+    public Comment? ParentComment {get;set;}
+
+    public ICollection<Comment> Replies { get; set; }
 }

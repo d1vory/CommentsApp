@@ -33,5 +33,14 @@ public class CommentController: ControllerBase
         return Ok(comment);
     }
     
+    [HttpPost]
+    [Route("{commentId}/reply")]
+    public async Task<ActionResult> CreateReplyComment([FromRoute] int commentId, [FromForm] CreateCommentDTO dto, IFormFile? file)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState.GetModelErrors());
+        var comment = await _service.CreateComment(dto, file, commentId);
+        
+        return Ok(comment);
+    }
     
 }

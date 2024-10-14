@@ -30,7 +30,7 @@ public class CommentService
         _webHostEnvironment = webHostEnvironment;
     }
 
-    public async Task<DetailCommentDTO> CreateComment(CreateCommentDTO dto,  IFormFile? photo)
+    public async Task<DetailCommentDTO> CreateComment(CreateCommentDTO dto,  IFormFile? photo, int? parentCommentId=null)
     {
         await ValidateComment(dto);
         var user = await GetOrCreateUser(dto);
@@ -40,12 +40,19 @@ public class CommentService
             imagePath = await UploadFile(photo);
         }
         var comment = new Comment() { Text = dto.Text, User = user, File = imagePath, CreatedAt = DateTime.Now};
+        if (parentCommentId != null)
+        {
+            var parentComment = await _db.Comments.FindAsync(parentCommentId);
+            if (parentComment == null) throw new NotFoundException("Parent comment is not found");
+            comment.ParentCommentId = parentCommentId;
+            comment.DiscussionKey = parentComment.DiscussionKey;
+        }
         await _db.Comments.AddAsync(comment);
         await _db.SaveChangesAsync();
         var createdCommentDTO = _mapper.Map<DetailCommentDTO>(comment);
         return createdCommentDTO;
     }
-    
+
     public async Task<PaginatedList<ListCommentDTO>> GetCommentsList(int pageIndex, int pageSize, string sortOrder)
     {
         var comments = SortItems(_db.Comments, sortOrder);
