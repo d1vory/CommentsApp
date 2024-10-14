@@ -41,7 +41,7 @@ public class CommentService
         }
         var comment = new Comment() { Text = dto.Text, User = user, File = imagePath, CreatedAt = DateTime.Now};
         await _db.Comments.AddAsync(comment);
-        //await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
         var createdCommentDTO = _mapper.Map<DetailCommentDTO>(comment);
         return createdCommentDTO;
     }
