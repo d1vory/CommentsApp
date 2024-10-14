@@ -64,7 +64,9 @@ public class CommentService
     {
         var parentComment = await _db.Comments.FindAsync(parentCommentId);
         if (parentComment == null) throw new NotFoundException("Parent comment is not found");
-        var comments = _db.Comments.Where(c => c.DiscussionKey == parentComment.DiscussionKey && c.Id != parentCommentId);
+        var comments = _db.Comments
+            .Where(c => c.DiscussionKey == parentComment.DiscussionKey && c.Id != parentCommentId)
+            .OrderByDescending(c => c.CreatedAt);
         var res = new List<RepliesCommentDTO>();
 
         var mappedComments = await _mapper.ProjectTo<RepliesCommentDTO>(comments).ToListAsync();
@@ -198,6 +200,11 @@ public class CommentService
 
     private async Task SaveFile(IFormFile fileForm, string path)
     {
+        var fileSize = fileForm.Length;
+        if (fileSize > 100000)
+        {
+            throw new BadRequestException("File is too large!");
+        }
         using (var stream = new FileStream(path, FileMode.Create))
         {
             await fileForm.CopyToAsync(stream);
