@@ -15,9 +15,12 @@ namespace CommentsApp.Services;
 
 public class CommentService
 {
+    private static readonly string[] AllowedPhotoExtensions = [".jpg", ".jpeg", ".gif", ".png"];
+    private static readonly string[] AllowedFileExtensions = [".txt"];
     private readonly BaseApplicationContext _db;
     private readonly IMapper _mapper;
     private IWebHostEnvironment _webHostEnvironment;
+    
 
 
     public CommentService(BaseApplicationContext db, IMapper mapper, IWebHostEnvironment webHostEnvironment)
@@ -107,13 +110,12 @@ public class CommentService
         var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", fileName);
         
         var extension = Path.GetExtension(filePath).ToLower();
-        var allowedPhotoExtensions = new[]{".jpg", ".jpeg", ".gif", ".png"};
-        var allowedFileExtensions = new[]{".txt"};
-        if (allowedPhotoExtensions.Contains(extension))
+
+        if (AllowedPhotoExtensions.Contains(extension))
         {
             await SaveImage(file, filePath);
         }
-        else if (allowedFileExtensions.Contains(extension))
+        else if (AllowedFileExtensions.Contains(extension))
         {
             await SaveFile(file, filePath);
         }
