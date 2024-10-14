@@ -59,6 +59,32 @@ public class CommentService
         var res = await PaginatedList<ListCommentDTO>.CreateAsync(comments, pageIndex, pageSize, _mapper);
         return res;
     }
+    
+    public async Task<List<RepliesCommentDTO>> GetCommentsRepliesList(int parentCommentId)
+    {
+        var parentComment = await _db.Comments.FindAsync(parentCommentId);
+        if (parentComment == null) throw new NotFoundException("Parent comment is not found");
+        var comments = _db.Comments.Where(c => c.DiscussionKey == parentComment.DiscussionKey && c.Id != parentCommentId);
+        var res = new List<RepliesCommentDTO>();
+
+        var mappedComments = await _mapper.ProjectTo<RepliesCommentDTO>(comments).ToListAsync();
+        var replyMap = mappedComments.ToDictionary(comment => comment.Id);
+
+        foreach (var comment in mappedComments)
+        {
+            if (comment.ParentCommentId == parentCommentId)
+            {
+                res.Add(comment);
+            }
+            else
+            {
+                var parent = replyMap[comment.ParentCommentId];
+                parent?.Replies.Add(comment);
+            }
+        }
+        
+        return res;
+    }
 
     private async Task<User> GetOrCreateUser(CreateCommentDTO dto)
     {

@@ -22,6 +22,14 @@ public class CommentController: ControllerBase
         var comments = await _service.GetCommentsList(pageIndex, pageSize, sortOrder);
         return Ok(comments);
     }
+    
+    [HttpGet]
+    [Route("{commentId}/replies")]
+    public async Task<ActionResult> GetReplyComments([FromRoute] int commentId)
+    {
+        var comments = await _service.GetCommentsRepliesList(commentId);
+        return Ok(comments);
+    }
 
     [HttpPost]
     [Route("")]

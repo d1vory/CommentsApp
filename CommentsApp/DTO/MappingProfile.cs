@@ -12,5 +12,6 @@ public class MappingProfile: Profile
         CreateMap<Models.User, DetailUserDTO>();
         CreateMap<Models.Comment, DetailCommentDTO>();
         CreateMap<Models.Comment, ListCommentDTO>();
+        CreateMap<Models.Comment, RepliesCommentDTO>().ForMember(x => x.Replies, opt => opt.Ignore());;
     }
 }
