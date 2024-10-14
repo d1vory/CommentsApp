@@ -41,7 +41,7 @@ public class CommentService
         }
         var comment = new Comment() { Text = dto.Text, User = user, File = imagePath, CreatedAt = DateTime.Now};
         await _db.Comments.AddAsync(comment);
-        //await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
         var createdCommentDTO = _mapper.Map<DetailCommentDTO>(comment);
         return createdCommentDTO;
     }
@@ -107,15 +107,17 @@ public class CommentService
         {
             var tagName = tagMatch.Groups[2].Value;
             var isSelfClosing = tagMatch.Groups[3].Value == "/";
-            if (isSelfClosing)
-            {
-                continue;
-            }
             var isClosing = tagMatch.Groups[1].Value == "/";
+
             if (isSelfClosing && isClosing)
             {
                 throw new BadRequestException("Html tags are not valid");
             }
+            if (isSelfClosing)
+            {
+                continue;
+            }
+
             if (!AllowedHtmlTags.Contains(tagName))
             {
                 throw new BadRequestException("Text has unsupported html tags!");
