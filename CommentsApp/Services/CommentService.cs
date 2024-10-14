@@ -1,11 +1,10 @@
+using System.Text.RegularExpressions;
 using AutoMapper;
 using CommentsApp.Data;
 using CommentsApp.DTO.Comment;
 using CommentsApp.DTO.Common;
 using CommentsApp.Models;
 using HttpExceptions.Exceptions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
@@ -17,6 +16,7 @@ public class CommentService
 {
     private static readonly string[] AllowedPhotoExtensions = [".jpg", ".jpeg", ".gif", ".png"];
     private static readonly string[] AllowedFileExtensions = [".txt"];
+    private static readonly string[] AllowedHtmlTags = ["a", "code", "i", "strong"];
     private readonly BaseApplicationContext _db;
     private readonly IMapper _mapper;
     private IWebHostEnvironment _webHostEnvironment;
@@ -41,7 +41,7 @@ public class CommentService
         }
         var comment = new Comment() { Text = dto.Text, User = user, File = imagePath, CreatedAt = DateTime.Now};
         await _db.Comments.AddAsync(comment);
-        await _db.SaveChangesAsync();
+        //await _db.SaveChangesAsync();
         var createdCommentDTO = _mapper.Map<DetailCommentDTO>(comment);
         return createdCommentDTO;
     }
@@ -49,8 +49,6 @@ public class CommentService
     public async Task<PaginatedList<ListCommentDTO>> GetCommentsList(int pageIndex, int pageSize, string sortOrder)
     {
         var comments = SortItems(_db.Comments, sortOrder);
-        
-        
         var res = await PaginatedList<ListCommentDTO>.CreateAsync(comments, pageIndex, pageSize, _mapper);
         return res;
     }
@@ -96,12 +94,47 @@ public class CommentService
 
     private async Task ValidateComment(CreateCommentDTO dto)
     {
-        await ValidateCommentText(dto.Text);
+        ValidateCommentTextTags(dto.Text);
     }
 
-    private async Task ValidateCommentText(string text)
+    private void ValidateCommentTextTags(string text)
     {
+        const string regex = @"<\s*(\/*)([a-zA-Z][a-zA-Z0-9]*)([^<>])*?>";
+        var matches = Regex.Matches(text, regex);
+        var tagStack = new Stack<string>();
         
+        foreach (Match tagMatch in matches)
+        {
+            var tagName = tagMatch.Groups[2].Value;
+            var isSelfClosing = tagMatch.Groups[3].Value == "/";
+            if (isSelfClosing)
+            {
+                continue;
+            }
+            var isClosing = tagMatch.Groups[1].Value == "/";
+            if (isSelfClosing && isClosing)
+            {
+                throw new BadRequestException("Html tags are not valid");
+            }
+            if (!AllowedHtmlTags.Contains(tagName))
+            {
+                throw new BadRequestException("Text has unsupported html tags!");
+            }
+            
+            switch (isClosing)
+            {
+                case false:
+                    tagStack.Push(tagName);
+                    continue;
+                case true when (tagStack.Count == 0 || tagStack.Pop() != tagName):
+                    throw new BadRequestException("Html tags are not valid");
+            }
+        }
+
+        if (tagStack.Count != 0)
+        {
+            throw new BadRequestException("Html tags are not valid");
+        }
     }
 
     private async Task<string> UploadFile(IFormFile file)
