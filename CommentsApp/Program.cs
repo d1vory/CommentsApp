@@ -3,6 +3,7 @@
 using CommentsApp.Data;
 using CommentsApp.Services;
 using CommentsApp.Utils;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+if (app.Environment.WebRootPath.IsNullOrEmpty())
+{
+    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"));
 }
 
 app.UseCors(a => a.AllowAnyOrigin());
