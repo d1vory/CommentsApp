@@ -22,7 +22,7 @@ public class ErrorHandlingMiddleware
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)ex.StatusCode;
-            var body = JsonConvert.SerializeObject(new { Message = ex.Message });
+            var body = JsonConvert.SerializeObject(new { message = ex.Message });
             await context.Response.WriteAsync(body);
         }
     }
