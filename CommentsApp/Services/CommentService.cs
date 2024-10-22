@@ -177,7 +177,10 @@ public class CommentService
     private async Task<string> UploadFile(IFormFile file)
     {
         var fileName = $"{Guid.NewGuid()}-{Path.GetFileName(file.FileName)}";
-        var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", fileName);
+        var directoryPath = Path.Combine(_webHostEnvironment.WebRootPath, "files");
+        Directory.CreateDirectory(directoryPath);
+
+        var filePath = Path.Combine(directoryPath, fileName);
         
         var extension = Path.GetExtension(filePath).ToLower();
 
