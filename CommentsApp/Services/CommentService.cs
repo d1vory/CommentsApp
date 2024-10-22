@@ -55,7 +55,7 @@ public class CommentService
 
     public async Task<PaginatedList<ListCommentDTO>> GetCommentsList(int pageIndex, int pageSize, string sortOrder)
     {
-        var comments = SortItems(_db.Comments, sortOrder);
+        var comments = SortItems(_db.Comments.Where(c => c.ParentCommentId==null), sortOrder);
         var res = await PaginatedList<ListCommentDTO>.CreateAsync(comments, pageIndex, pageSize, _mapper);
         return res;
     }
