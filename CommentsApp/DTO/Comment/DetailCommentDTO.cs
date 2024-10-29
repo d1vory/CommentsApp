@@ -13,4 +13,6 @@ public class DetailCommentDTO
     public DateTime CreatedAt { get; set; }
     
     public string? File { get; set; } = null;
+
+    public int? ParentCommentId { get; set; } = null;
 }
