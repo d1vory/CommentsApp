@@ -93,7 +93,7 @@ public class CommentService
         var user = await _db.Users.Where(u => u.Email == dto.Email).FirstOrDefaultAsync();
         if (user != null) return user;
 
-        user = new User() { Email = dto.Email, Username = dto.Username, HomePage = dto.HomePage };
+        user = new User() { Email = dto.Email, Username = dto.Username, HomePage = dto.HomePage ?? "" };
         await _db.Users.AddAsync(user);
         await _db.SaveChangesAsync();
         return user;
@@ -197,7 +197,7 @@ public class CommentService
             throw new BadRequestException("This file type is not supported");
         }
         
-        var imagePath = $"images/{fileName}";
+        var imagePath = $"files/{fileName}";
         return imagePath;
     }
 
